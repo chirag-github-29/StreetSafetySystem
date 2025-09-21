@@ -1,0 +1,42 @@
+[
+  {
+    "lat": 19.021,
+    "lng": 72.841,
+    "neighborhood": "Ambedkar Road",
+    "type": "Theft",
+    "warning": "Several theft incidents reported recently. Be careful with your belongings!",
+    "risk": "high"
+  },
+  {
+    "lat": 19.022,
+    "lng": 72.842,
+    "neighborhood": "Ambedkar Road",
+    "type": "Robbery",
+    "warning": "Robbery cases reported at night. Avoid isolated areas after dark.",
+    "risk": "high"
+  },
+  {
+    "lat": 19.023,
+    "lng": 72.843,
+    "neighborhood": "Ambedkar Road",
+    "type": "Assault",
+    "warning": "A few assault incidents reported recently. Stay alert when walking alone.",
+    "risk": "medium"
+  },
+  {
+    "lat": 19.024,
+    "lng": 72.844,
+    "neighborhood": "Ambedkar Road",
+    "type": "Pickpocketing",
+    "warning": "Pickpocketing reported near crowded areas. Keep your valuables safe.",
+    "risk": "medium"
+  },
+  {
+    "lat": 19.025,
+    "lng": 72.845,
+    "neighborhood": "Ambedkar Road",
+    "type": "Vandalism",
+    "warning": "Some vandalism incidents reported. Watch for suspicious activity.",
+    "risk": "low"
+  }
+]
