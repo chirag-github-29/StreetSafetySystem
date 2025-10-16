@@ -1,71 +1,33 @@
-// 1. Initialize the map (start zoomed out)
-var map = L.map('map').setView([0, 0], 2);
+// Initialize map with a default view (e.g., New York City) in case geolocation fails
+const map = L.map('map').setView([40.7128, -74.0060], 13);
 
-// 2. Add OpenStreetMap tiles
+// Add OpenStreetMap tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '© OpenStreetMap contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// 3. Enable user location tracking
-map.locate({ setView: true, maxZoom: 16, watch: true });
+// Get current location using geolocation API
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-// 4. Marker for user location
-var userMarker, accuracyCircle;
+        // Set map view to current location
+        map.setView([lat, lon], 13);
 
-function onLocationFound(e) {
-  var lat = e.latlng.lat;
-  var lng = e.latlng.lng;
-  var accuracy = e.accuracy; // in meters
-
-  if (userMarker) {
-    // update position
-    userMarker.setLatLng([lat, lng]);
-    accuracyCircle.setLatLng([lat, lng]).setRadius(accuracy);
-  } else {
-    // create marker + accuracy circle
-    userMarker = L.marker([lat, lng]).addTo(map)
-      .bindPopup("You are here").openPopup();
-
-    accuracyCircle = L.circle([lat, lng], { radius: accuracy }).addTo(map);
-  }
-
-
+        // Add a marker at the current location
+        const marker = L.marker([lat, lon]).addTo(map);
+        marker.bindPopup("<b>Your Current Location</b>").openPopup();
+    }, function(error) {
+        console.error("Error getting geolocation: ", error);
+        alert("Could not retrieve your location. Displaying default map.");
+        // Optionally, add a marker at the default location if geolocation fails
+        const defaultMarker = L.marker([40.7128, -74.0060]).addTo(map);
+        defaultMarker.bindPopup("<b>Default Location</b><br>Could not retrieve your location.");
+    });
+} else {
+    alert("Geolocation is not supported by your browser. Displaying default map.");
+    // Optionally, add a marker at the default location if geolocation is not supported
+    const defaultMarker = L.marker([40.7128, -74.0060]).addTo(map);
+    defaultMarker.bindPopup("<b>Default Location</b><br>Geolocation not supported.");
 }
-
-function loadCrimeData() {
-    fetch('./data/crimes.json')
-        .then(response => response.json())
-        .then(crimeData => {
-            crimeData.forEach(crime => {
-                let color;
-                if (crime.risk === 'high') {
-                    color = 'red';
-                } else if (crime.risk === 'medium') {
-                    color = 'orange';
-                } else {
-                    color = 'green';
-                }
-
-                L.circleMarker([crime.lat, crime.lng], {
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.7,
-                    radius: 8
-                }).addTo(map)
-                  .bindPopup(`<b>${crime.type}</b><br>${crime.warning}`);
-            });
-        })
-        .catch(error => console.error('Error loading crime data:', error));
-}
-
-function onLocationError(e) {
-  alert("Location access denied or unavailable.");
-}
-
-// Leaflet events
-map.on('locationfound', onLocationFound);
-map.on('locationerror', onLocationError);
-
-// Load crime data on map initialization
-loadCrimeData();
