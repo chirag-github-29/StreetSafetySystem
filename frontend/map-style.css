@@ -7,3 +7,115 @@ body {
     height: 100vh;
     width: 100%;
 }
+
+#crimeReportForm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+}
+
+#crimeReportForm h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+#crimeReportForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+#crimeReportForm input[type="text"],
+#crimeReportForm textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#crimeReportForm select#crime-type {
+    width: 100%; /* Simplified width calculation */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: white;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none; /* Fixed typo from '-moz-apnet pearance' */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2C114.7L159.2%2C242.5c-5.8%2C5.8-15.2%2C5.8-21%2C0L5.4%2C114.7c-5.8-5.8-5.8-15.2%2C0-21l10.5-10.5c5.8-5.8%2C15.2-5.8%2C21%2C0l115.8%2C115.9l115.8-115.9c5.8-5.8%2C15.2-5.8%2C21%2C0l10.5%2C10.5C292.8%2C99.5%2C292.8%2C108.9%2C287%2C114.7z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px;
+}
+
+#crimeReportForm textarea {
+    resize: vertical;
+}
+
+#reportCrimeBtn {
+    background-color: #dc3545; /* Red color */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px; /* Add some space above the button if needed */
+}
+
+#reportCrimeBtn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+#crimeReportForm button#cancelCrimeReport {
+    background-color: #6c757d;
+}
+
+#crimeReportForm button#cancelCrimeReport:hover {
+    background-color: #5a6268;
+}
+
+#successMessage {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+}
+
+#crimeReportForm .location-block {
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+#crimeReportForm .address-block {
+    background-color: #e9f5ff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+#crimeReportForm .location-block label,
+#crimeReportForm .address-block label {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+}
