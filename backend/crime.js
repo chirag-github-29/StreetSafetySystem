@@ -29,6 +29,22 @@ const crimeSchema = new mongoose.Schema({
     details: {
         type: String
     },
+    upvotes: {
+        type: Number,
+        default: 0
+    },
+    downvotes: {
+        type: Number,
+        default: 0
+    },
+    upvotedBy: { // New field to store user emails who upvoted
+        type: [String],
+        default: []
+    },
+    downvotedBy: { // New field to store user emails who downvoted
+        type: [String],
+        default: []
+    },
     createdAt: {
         type: Date,
         default: Date.now

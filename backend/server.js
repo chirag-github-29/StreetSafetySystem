@@ -36,28 +36,30 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).send('Invalid credentials');
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
-    // Redirect the browser to map.html
-    res.redirect('/map.html');
+    // Send user email in the response for client-side storage and redirect
+    res.status(200).json({ message: 'Login successful', userEmail: user.email });
   } catch (err) {
-    res.status(500).send('Login failed: ' + err.message);
+    res.status(500).json({ error: 'Login failed: ' + err.message });
   }
 });
 
 // New endpoint to submit crime data
 app.post('/api/crimes', async (req, res) => {
   try {
-    const { type, location, details, latitude, longitude, address } = req.body; // Add 'address' here
+    const { type, location, details, latitude, longitude, address } = req.body;
 
     // Determine severity based on crime type
     let severity;
-    const redSeverityCrimes = ['Murder', 'Rape', 'Robbery', 'Violent Assault'];
-    const yellowSeverityCrimes = ['Theft', 'Drug', 'Nuisance'];
+    const redSeverityCrimes = ['murder', 'rape', 'robbery', 'violent assault']; // Changed to lowercase
+    const yellowSeverityCrimes = ['theft', 'drug', 'nuisance']; // Changed to lowercase
 
-    if (redSeverityCrimes.includes(type)) {
+    const crimeTypeLower = type.toLowerCase(); // Convert incoming type to lowercase
+
+    if (redSeverityCrimes.includes(crimeTypeLower)) {
         severity = 'red';
-    } else if (yellowSeverityCrimes.includes(type)) {
+    } else if (yellowSeverityCrimes.includes(crimeTypeLower)) {
         severity = 'yellow';
     } else {
         severity = 'yellow'; // Default to yellow if type not explicitly defined
@@ -69,8 +71,10 @@ app.post('/api/crimes', async (req, res) => {
         details,
         latitude,
         longitude,
+        address,
         severity,
-        address // Add address to the new Crime object
+        upvotes: 0,
+        downvotes: 0
     });
 
     await newCrime.save();
@@ -81,16 +85,82 @@ app.post('/api/crimes', async (req, res) => {
   }
 });
 
-// New endpoint to fetch all crime data
+// New endpoint to get all crimes, sorted by upvotes
 app.get('/api/crimes', async (req, res) => {
-  try {
-    const crimes = await Crime.find({});
-    res.status(200).json(crimes);
-  } catch (error) {
-    console.error('Error fetching crime data:', error);
-    res.status(500).json({ message: 'Error fetching crime data', error: error.message });
-  }
+    try {
+        const crimes = await Crime.find().sort({ upvotes: -1 }); // Sort by upvotes in descending order
+        res.status(200).json(crimes);
+    } catch (error) {
+        console.error('Error fetching crimes:', error);
+        res.status(500).json({ message: 'Error fetching crimes', error: error.message });
+    }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// New endpoint to upvote a crime
+app.post('/api/crimes/:id/upvote', async (req, res) => {
+    try {
+        const { userEmail } = req.body;
+        const crime = await Crime.findById(req.params.id);
+
+        if (!crime) {
+            return res.status(404).json({ message: 'Crime not found' });
+        }
+
+        // If the user has already upvoted, do nothing or send a message indicating so
+        if (crime.upvotedBy.includes(userEmail)) {
+            return res.status(200).json({ message: 'You have already upvoted this crime', crime });
+        }
+
+        // If the user previously downvoted, remove their downvote first
+        if (crime.downvotedBy.includes(userEmail)) {
+            crime.downvotes--;
+            crime.downvotedBy = crime.downvotedBy.filter(email => email !== userEmail);
+        }
+
+        crime.upvotes++;
+        crime.upvotedBy.push(userEmail);
+        await crime.save();
+
+        res.status(200).json(crime);
+    } catch (error) {
+        console.error('Error upvoting crime:', error);
+        res.status(500).json({ message: 'Error upvoting crime', error: error.message });
+    }
+});
+
+// New endpoint to downvote a crime
+app.post('/api/crimes/:id/downvote', async (req, res) => {
+    try {
+        const { userEmail } = req.body;
+        const crime = await Crime.findById(req.params.id);
+
+        if (!crime) {
+            return res.status(404).json({ message: 'Crime not found' });
+        }
+
+        // Check if the user has already downvoted
+        if (crime.downvotedBy.includes(userEmail)) {
+            // Return 200 OK with the current crime object, similar to upvote endpoint
+            return res.status(200).json({ message: 'You have already downvoted this crime', crime });
+        }
+
+        // If the user previously upvoted, remove their upvote
+        if (crime.upvotedBy.includes(userEmail)) {
+            crime.upvotes--;
+            crime.upvotedBy = crime.upvotedBy.filter(email => email !== userEmail);
+        }
+
+        crime.downvotes++;
+        crime.downvotedBy.push(userEmail);
+        await crime.save();
+
+        res.status(200).json(crime);
+    } catch (error) {
+        console.error('Error downvoting crime:', error);
+        res.status(500).json({ message: 'Error downvoting crime', error: error.message });
+    }
+});
+
+app.listen(5000, () => {
+  console.log('Server running on port 5000');
+});

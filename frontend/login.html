@@ -95,17 +95,13 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                // Check if the response is a redirect
-                if (response.redirected) {
-                    window.location.href = response.url; // Follow the redirect
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    localStorage.setItem('userEmail', data.userEmail); // Store user's email from response
+                    window.location.href = 'map.html'; // Client-side redirect
                 } else {
-                    const data = await response.json();
-                    if (response.ok) {
-                        alert(data.message);
-                        // No client-side redirect needed here, as the server handles it
-                    } else {
-                        loginError.textContent = data.error || 'Login failed';
-                    }
+                    loginError.textContent = data.error || 'Login failed';
                 }
             } catch (error) {
                 console.error('Error:', error);
